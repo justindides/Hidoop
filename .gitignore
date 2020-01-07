@@ -28,7 +28,6 @@ hs_err_pid*
 
 # End of https://www.gitignore.io/api/java
 # Ignorer le fichier du path 
-Project.java
 filesample1-bloc1.txt
 filesample1-bloc2.txt
 filesample1-concatenated.txt
