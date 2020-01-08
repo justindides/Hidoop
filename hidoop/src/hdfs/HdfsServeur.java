@@ -53,7 +53,7 @@ public class HdfsServeur extends Thread {
 				String line = br.readLine() ;
 				while (line != null ) {
 					strToSend += line + "\n";
-					line = br.readLine() ;
+					line = br.readLine();
 				}
 				br.close();
 				// Envoie de la chaine de caractère 
@@ -68,7 +68,7 @@ public class HdfsServeur extends Thread {
 			break;
 			
 		case CMD_WRITE:
-			System.out.println("Demande d'écriture reçue ...");
+			System.out.println("Demande d'ecriture recue ...");
 
 			FileWriter fw;
 			try {

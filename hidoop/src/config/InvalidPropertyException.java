@@ -1,4 +1,4 @@
-package hdfs;
+package config;
 
 public class InvalidPropertyException extends Exception {
 
