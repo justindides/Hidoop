@@ -21,6 +21,8 @@ public class Project implements Serializable {
 	/** Liste des URL des daemons, récupéré par un fichier de config. */ 
 	public List<String> urlNodes = new ArrayList<String>();
 	
+	public List<Integer> portNodes = new ArrayList<Integer>();
+	
 	/** HashMap associant le fichier traité à son nombre de frgament */
 	public HashMap<String,Integer> numberOfMaps;
 	
@@ -54,17 +56,22 @@ public class Project implements Serializable {
 
 		Properties propConf = new Properties();
 		Properties propDaemons = new Properties();
+		Properties propPorts = new Properties();
 		int numberOfFile = 0;
 
 		try {
 			FileInputStream isConf = new FileInputStream("hidoop/data/hdfsclient/structure.conf");
 			FileInputStream isDaemons = new FileInputStream("hidoop/data/hdfsclient/daemons.listofurl");
+			FileInputStream isPorts = new FileInputStream("hidoop/data/hdfsclient/portDaemons.conf");
 
 			propDaemons.load(isDaemons);
 			isDaemons.close();
 
 			propConf.load(isConf);
 			isConf.close();
+			
+			propPorts.load(isPorts);
+			isPorts.close();
 
 			String property = propConf.getProperty("fileName0");
 			
@@ -89,11 +96,23 @@ public class Project implements Serializable {
 
 			while(daemon != null) {
 				urlNodes.add(daemon);
+				System.out.println("Config : Daemon " + nbDaemons + " recupere : " + daemon);
 				nbDaemons++;
 				daemon = propConf.getProperty("url" + nbDaemons);
 			}
+			
+			/* Récupération des ports sockets des daemons. */
+			String port = propPorts.getProperty("port0");
+			int nbPorts = 0;
+			
+			while(port != null) {
+				portNodes.add(Integer.parseInt(port));
+				System.out.println("Config : Port " + nbPorts + " recupere : " + port);
+				nbPorts++;
+				port = propPorts.getProperty("port" + nbPorts);
+			}
 
-
+			
 			for (int i = 1; i <= inputFileNameList.size(); i++) {
 				System.out.println(inputFileNameList.get(i));
 				if (inputFileNameList.get(i) == null) {
