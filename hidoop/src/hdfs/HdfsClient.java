@@ -23,7 +23,7 @@ public class HdfsClient {
 
 	// private static final long serialVersionUID = 1L;
 	/** Structure contient toutes la configuration initiale du projet ainsi que les 
-	 * informations qu'on a à donner à Hidoop.
+	 * informations qu'on a ï¿½ donner ï¿½ Hidoop.
 	 */
 	private static Project structure = new Project();
 	
@@ -33,7 +33,7 @@ public class HdfsClient {
 	/** Nombre de daemons hidoop disponible */
 	private static int nbNodes;
 
-	/** Définie la taille maximal d'un fragment lors de l'écriture. */
+	/** Dï¿½finie la taille maximal d'un fragment lors de l'ï¿½criture. */
 	private static int tailleMaxFragment = 100;
 
 	/** Port vers les ndoes */
@@ -171,7 +171,7 @@ public class HdfsClient {
 		String fSansExtension = hdfsFname.replaceFirst("[.][^.]+$", "");
 		int node = 0;
 
-		/* Fichier dans lequel on écrira le résultat de la lecture */
+		/* Fichier dans lequel on ï¿½crira le rï¿½sultat de la lecture */
 		File f = new File(localFSDestFname);
 		FileWriter fw;
 
@@ -180,15 +180,15 @@ public class HdfsClient {
 			
 			fw = new FileWriter(f);
 			
-			/* Pour chaque fragment, on possède l'URL du node le stockant. */
+			/* Pour chaque fragment, on possï¿½de l'URL du node le stockant. */
 			mappingBlocs.forEach((i, url) -> {
 				Socket sock;
 				try {
-				/* On ouvre une connexion poura chaque fragment, on lie, on le concatene à strRecu */
+				/* On ouvre une connexion poura chaque fragment, on lie, on le concatene ï¿½ strRecu */
 					sock = new Socket(url, port);
 					Connexion c = new Connexion(sock);
 					
-				/* Rappel : le nom d'un fragment est nom_du_fichier-blocx avec x numéro du fragment. */
+				/* Rappel : le nom d'un fragment est nom_du_fichier-blocx avec x numï¿½ro du fragment. */
 					Commande cmd = new Commande(Commande.Cmd.CMD_READ, fSansExtension + "-bloc" + i, 0);
 					c.send(cmd);
 					
@@ -248,7 +248,7 @@ public class HdfsClient {
 	public static String getNamNodeURL() {
 		String res = null;
 		try {
-			FileInputStream in = new FileInputStream("hidoop/data/hdfsClient/NameNode.url");
+			FileInputStream in = new FileInputStream("hidoop/data/hdfsClient/namenode.url");
 			Properties prop = new Properties();
 			prop.load(in);
 			in.close();
@@ -303,7 +303,7 @@ public class HdfsClient {
 				HdfsWrite(fmt, args[2], 1);
 			}
 
-			/* Mise à jour du namenode */
+			/* Mise ï¿½ jour du namenode */
 			nNI.updateStructure(structure);
 		} catch (Exception e) {
 			e.printStackTrace();
