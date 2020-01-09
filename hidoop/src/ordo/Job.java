@@ -93,7 +93,7 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 
 		String[] res = originalFname.split("[.]");
 
-		for (int id = 1; id < numberOfMaps + 1; id++) {
+		for (int id = 0; id < numberOfMaps ; id++) {
 
 			inputFname = Project.PATH + res[0] + "-bloc" + id + "." + res[1];
 

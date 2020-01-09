@@ -27,7 +27,7 @@ public class Project implements Serializable {
 	public List<Integer> portNodes = new ArrayList<Integer>();
 	
 	/** HashMap associant le fichier trait� � son nombre de frgament */
-	public HashMap<String,Integer> numberOfMaps;
+	public HashMap<String,Integer> numberOfMaps = new HashMap<String, Integer>();
 	
 	/** HashMap associant un fichier trait� par HDFS � une autre map contenant 
 	 * les couples : n� de bloc <-> URL du deamon le stockant. Cette donn�e �quivaut � la cartographie 

@@ -18,7 +18,7 @@ public class NameNode extends UnicastRemoteObject implements NameNodeInterface {
 	private static String URL;
 	//private static String hdfsClientURL;
 	private Project structure;
-	private static int port = 8003;
+	private static int port = 8000;
 	//private int idFile;
 
 	public NameNode() throws RemoteException {

@@ -63,7 +63,7 @@ public class HdfsClient {
 				int nbNode = data.urlDaemons.indexOf(url);
 				sock = new Socket(data.urlServ.get(nbNode), data.portNodes.get(nbNode));
 				Connexion c = new Connexion(sock);
-				Commande cmd = new Commande(Commande.Cmd.CMD_DELETE, fSansExtension + "-bloc" + i, 0);
+				Commande cmd = new Commande(Commande.Cmd.CMD_DELETE, fSansExtension + "-bloc" + i + ".txt", 0);
 				c.send(cmd);
 				c.Close();
 				// On supprime des data du projet le fragment.
@@ -120,7 +120,8 @@ public class HdfsClient {
 			HashMap<Integer, String> mappingBlocs = new HashMap<Integer, String>();
 			
 			for (i = 0; i < nbFragment; i++) {
-				System.out.println("NbNode sock : " + node);
+				System.out.println(data.urlServ.get(node));
+				System.out.println(data.portNodes.get(node));
 				Socket sock = new Socket(data.urlServ.get(node), data.portNodes.get(node));
 				Connexion c = new Connexion(sock);
 				System.out.println("Ecriture du fragment n " + i + " sur le node " + node);
@@ -132,7 +133,7 @@ public class HdfsClient {
 					System.out.println("Fin du fichier atteinte, ecriture du dernier fragment");
 					System.out.println("Envoi de la commande d'ecriture...");
 
-					cmd = new Commande(Commande.Cmd.CMD_WRITE, fSansExtension + "-bloc" + i, reste);
+					cmd = new Commande(Commande.Cmd.CMD_WRITE, fSansExtension + "-bloc" + i + ".txt", reste);
 					c.send(cmd);
 					/*
 					 * On copie la dernière lecture dans le buffer plus petit ayant une taille
@@ -144,7 +145,7 @@ public class HdfsClient {
 				} else {
 					System.out.println("Envoi de la commande d'ecriture...");
 					/* Envoi de la commande */
-					cmd = new Commande(Commande.Cmd.CMD_WRITE, fSansExtension + "-bloc" + i, tailleMaxFragment);
+					cmd = new Commande(Commande.Cmd.CMD_WRITE, fSansExtension + "-bloc" + i + ".txt", tailleMaxFragment);
 					c.send(cmd);
 					System.out.println("Envoi du fragment...");
 					c.send(buf);
@@ -152,15 +153,18 @@ public class HdfsClient {
 				
 				/* Association du fragment au node correspondant */
 				mappingBlocs.put(i, data.urlDaemons.get(node));
-				
+
 				node++;
 				if (node == nbNodes) {
 					node = 0;
 				}
 				c.Close();
 			}
+			
+			data.numberOfMaps.put(localFSSourceFname, nbFragment);
+			
 			System.out.println("Fin de l'ecriture " + i + " fragment ecrits.");
-			data.daemonsFragmentRepartized.put(fSansExtension, mappingBlocs);
+			data.daemonsFragmentRepartized.put(localFSSourceFname, mappingBlocs);
 			
 			fr.close();
 		} catch (IOException e) {
@@ -283,6 +287,7 @@ public class HdfsClient {
 			}
 
 			/* Mise � jour du namenode */
+			System.out.println(data.numberOfMaps.get(args[1]));
 			nNI.updateStructure(data);
 
 		} catch (Exception e) {
