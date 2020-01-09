@@ -19,4 +19,8 @@ public interface NameNodeInterface extends Remote {
 	
 	public void updateStructure(Project struct) throws RemoteException;
 
+	public boolean structureExists() throws RemoteException;
+
+	public Project recoverStructure()throws RemoteException;
+
 }

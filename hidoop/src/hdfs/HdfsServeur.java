@@ -82,7 +82,7 @@ public class HdfsServeur extends Thread {
 				
 				//Fermeture du fichier
 				fw.close();
-				System.out.println("fragment "+ cmd.getNomFichier() + " enregistre");
+				System.out.println("fragment "+ cmd.getNomFichier() + " ecrit");
 				} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

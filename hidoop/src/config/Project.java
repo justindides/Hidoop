@@ -19,11 +19,14 @@ public class Project implements Serializable {
 	public static String PATH = "hidoop/data/";
 
 	/** Liste des URL des daemons, rï¿½cupï¿½rï¿½ par un fichier de config. */ 
-	public List<String> urlNodes = new ArrayList<String>();
+	public List<String> urlServ= new ArrayList<String>();
+	
+	/** Liste des URL des nodes, rï¿½cupï¿½rï¿½ par un fichier de config. */ 
+	public List<String> urlDaemons = new ArrayList<String>();
 	
 	public List<Integer> portNodes = new ArrayList<Integer>();
 	
-	/** HashMap associant le fichier traité à son nombre de frgament */
+	/** HashMap associant le fichier traitï¿½ ï¿½ son nombre de frgament */
 	public HashMap<String,Integer> numberOfMaps;
 	
 	/** HashMap associant un fichier traitï¿½ par HDFS ï¿½ une autre map contenant 
@@ -57,15 +60,20 @@ public class Project implements Serializable {
 		Properties propConf = new Properties();
 		Properties propDaemons = new Properties();
 		Properties propPorts = new Properties();
+		Properties propServ = new Properties();
 		int numberOfFile = 0;
 
 		try {
-			FileInputStream isPorts = new FileInputStream("hidoop/data/hdfsclient/portDaemons.conf");
+			FileInputStream isPorts = new FileInputStream("hidoop/data/hdfsClient/portDaemons.conf");
 			FileInputStream isConf = new FileInputStream("hidoop/data/hdfsClient/structure.conf");
 			FileInputStream isDaemons = new FileInputStream("hidoop/data/hdfsClient/daemons.listofurl");
+			FileInputStream isServ = new FileInputStream("hidoop/data/hdfsClient/servHdfs.listofurl");
 
 			propDaemons.load(isDaemons);
 			isDaemons.close();
+			
+			propServ.load(isServ);
+			isServ.close();
 
 			propConf.load(isConf);
 			isConf.close();
@@ -95,15 +103,28 @@ public class Project implements Serializable {
 			String daemon = propDaemons.getProperty("url0");
 
 			while(daemon != null) {
-				urlNodes.add(daemon);
+				urlDaemons.add(daemon);
 				System.out.println("Config : Daemon " + nbDaemons + " recupere : " + daemon);
 				nbDaemons++;
-				daemon = propConf.getProperty("url" + nbDaemons);
+				daemon = propDaemons.getProperty("url" + nbDaemons);
 			}
 			
-			/* Récupération des ports sockets des daemons. */
-			String port = propPorts.getProperty("port0");
+			int nbServ = 0;
+			
+			String serv = propServ.getProperty("url0");
+
+			while(serv != null) {
+				urlServ.add(serv);
+				System.out.println("Config : Serveur " + nbServ + " recupere : " + serv);
+				nbServ++;
+				serv = propServ.getProperty("url" + nbServ);
+			}
+			
+			/* Rï¿½cupï¿½ration des ports sockets des daemons. */
 			int nbPorts = 0;
+			
+			String port = propPorts.getProperty("port0");
+
 			
 			while(port != null) {
 				portNodes.add(Integer.parseInt(port));

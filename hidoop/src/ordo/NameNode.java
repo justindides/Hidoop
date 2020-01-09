@@ -18,16 +18,26 @@ public class NameNode extends UnicastRemoteObject implements NameNodeInterface {
 	private static String URL;
 	//private static String hdfsClientURL;
 	private Project structure;
-	private static int port = 8000;
+	private static int port = 8003;
 	//private int idFile;
 
 	public NameNode() throws RemoteException {
 	}
 	
+	/** Setter de la structure du projet */
 	public void updateStructure(Project struct) throws RemoteException {
 		structure = struct;
+		System.out.println("Update structure : Reception d'une nouvelle structure par HDFSClient.");
+	}
+	/** Getter de la structure du projet */
+	public Project recoverStructure() throws RemoteException {
+		System.out.println("Requete de récuperation de structure par HDFSClient");
+		return structure;
 	}
 
+	public boolean structureExists() throws RemoteException{
+		return (structure != null);
+	}
 /*	public void setInputFname(String inputFname) throws RemoteException, WrongFileNameException {
 		idFile = 1;
 

@@ -4,6 +4,7 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Set;
 
 import config.InvalidPropertyException;
 import config.Project;
@@ -23,9 +24,9 @@ public class HdfsClient {
 
 	// private static final long serialVersionUID = 1L;
 	/** Data contient toutes la configuration initiale du projet ainsi que les 
-	 * informations qu'on a à donner à Hidoop.
+	 * informations qu'on a ï¿½ donner ï¿½ Hidoop.
 	 */
-	private static Project data = new Project();
+	private static Project data;
 	
 	/** L'URL de la machine contenant le namenode. */
 	private static String nameNodeURL;
@@ -34,7 +35,7 @@ public class HdfsClient {
 	private static int nbNodes;
 
 	/** Dï¿½finie la taille maximal d'un fragment lors de l'ï¿½criture. */
-	private static int tailleMaxFragment = 100;
+	private static int tailleMaxFragment = 20;
 	
 	/** Texte recu lors d'une lecture. */
 	private static String strRecu;
@@ -49,30 +50,33 @@ public class HdfsClient {
 
 		// Voir quel node possede le fichier (consultation du namenode)
 		// pour utiliser la bonne connexion.
-		HashMap<Integer, String> mappingBlocs = data.daemonsFragmentRepartized.get(hdfsFname);
 		String fSansExtension = hdfsFname.replaceFirst("[.][^.]+$", "");
-				
+
+		HashMap<Integer, String> mappingBlocs = data.daemonsFragmentRepartized.get(fSansExtension);
+
 		mappingBlocs.forEach((i, url) -> {
 			Socket sock;
-			int node = 0;
 			try {
-			/* Pour récupérer le port, on cherche l'indice d'url dans notre liste d'url. 
+			/* Pour recuperer le port, on cherche l'indice d'url dans notre liste d'url. 
 			 * Cette indice correspond au port dans la liste des ports.
 			 */
-				sock = new Socket(url, data.portNodes.get(data.urlNodes.indexOf(url)));
+				int nbNode = data.urlDaemons.indexOf(url);
+				sock = new Socket(data.urlServ.get(nbNode), data.portNodes.get(nbNode));
 				Connexion c = new Connexion(sock);
 				Commande cmd = new Commande(Commande.Cmd.CMD_DELETE, fSansExtension + "-bloc" + i, 0);
 				c.send(cmd);
 				c.Close();
 				// On supprime des data du projet le fragment.
-				data.daemonsFragmentRepartized.get(hdfsFname).remove(i);
+				data.daemonsFragmentRepartized.get(fSansExtension).remove(i);
+				System.out.println("Suppresion de " + fSansExtension + "-bloc" + i + " sur le node " + nbNode);
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		});
-	}
+		data.daemonsFragmentRepartized.remove(fSansExtension);
+	} 
 
 	/***************** WRITE ********************/
 	public static void HdfsWrite(Format.Type fmt, String localFSSourceFname, int repFactor) {
@@ -116,7 +120,8 @@ public class HdfsClient {
 			HashMap<Integer, String> mappingBlocs = new HashMap<Integer, String>();
 			
 			for (i = 0; i < nbFragment; i++) {
-				Socket sock = new Socket("Localhost", data.portNodes.get(node));
+				System.out.println("NbNode sock : " + node);
+				Socket sock = new Socket(data.urlServ.get(node), data.portNodes.get(node));
 				Connexion c = new Connexion(sock);
 				System.out.println("Ecriture du fragment n " + i + " sur le node " + node);
 				System.out.println("Lecture...");
@@ -146,7 +151,7 @@ public class HdfsClient {
 				}
 				
 				/* Association du fragment au node correspondant */
-				mappingBlocs.put(i, data.urlNodes.get(node));
+				mappingBlocs.put(i, data.urlDaemons.get(node));
 				
 				node++;
 				if (node == nbNodes) {
@@ -155,8 +160,7 @@ public class HdfsClient {
 				c.Close();
 			}
 			System.out.println("Fin de l'ecriture " + i + " fragment ecrits.");
-			
-			data.daemonsFragmentRepartized.put(localFSSourceFname, mappingBlocs);
+			data.daemonsFragmentRepartized.put(fSansExtension, mappingBlocs);
 			
 			fr.close();
 		} catch (IOException e) {
@@ -167,11 +171,12 @@ public class HdfsClient {
 	public static void HdfsRead(String hdfsFname, String localFSDestFname) {
 		// Voir quel node possede le fichier (consultation du namenode)
 		// pour utiliser la bonne connexion.
-		HashMap<Integer, String> mappingBlocs = data.daemonsFragmentRepartized.get(hdfsFname);
 		String fSansExtension = hdfsFname.replaceFirst("[.][^.]+$", "");
-		int node = 0;
+
+		HashMap<Integer, String> mappingBlocs = data.daemonsFragmentRepartized.get(fSansExtension);
 
 		/* Fichier dans lequel on ï¿½crira le rï¿½sultat de la lecture */
+		localFSDestFname = data.PATH + fSansExtension + "_recover";
 		File f = new File(localFSDestFname);
 		FileWriter fw;
 
@@ -180,13 +185,13 @@ public class HdfsClient {
 			
 			fw = new FileWriter(f);
 
-			/* Pour chaque fragment, on possède l'URL du node le stockant. */
+			/* Pour chaque fragment, on possï¿½de l'URL du node le stockant. */
 			mappingBlocs.forEach((i, url) -> {
 
 				try {
-
-				/* On ouvre une connexion poura chaque fragment, on lie, on le concatene à strRecu */
-					Socket sock = new Socket(url, data.portNodes.get(data.urlNodes.indexOf(url)));
+					int nbNode = data.urlDaemons.indexOf(url);
+				/* On ouvre une connexion poura chaque fragment, on lie, on le concatene ï¿½ strRecu */
+					Socket sock = new Socket(data.urlServ.get(nbNode), data.portNodes.get(nbNode));
 					Connexion c = new Connexion(sock);
 					
 				/* Rappel : le nom d'un fragment est nom_du_fichier-blocx avec x numï¿½ro du fragment. */
@@ -195,6 +200,8 @@ public class HdfsClient {
 					
 					// On concatene les textes de tous les fragments.
 					strRecu = strRecu + (String) c.receive();
+					
+					System.out.println("Lecture du fragment " + fSansExtension + "-bloc" + i + " sur le node " + nbNode);
 	
 					c.Close();
 				} catch (UnknownHostException e) {
@@ -210,41 +217,6 @@ public class HdfsClient {
 		}
 	}
 
-
-
-	/*
-	 * public Project getStructureMapReduce() { return structure; }
-	 */
-	/* public static HashMap<Integer, HashMap<Integer, String>> repartition_des_blocs(
-			HashMap<Integer, String> listOfDaemons) {
-
-		HashMap<Integer, String> l = new HashMap<Integer, String>();
-		HashMap<Integer, HashMap<Integer, String>> repartition_bloc = new HashMap<Integer, HashMap<Integer, String>>();
-
-		// Fichier 1
-		l.put(1, listOfDaemons.get(1));
-		repartition_bloc.put(1, l);
-
-		/*
-		 * l.put(2, listOfDaemons.get(2)); l.put(3, listOfDaemons.get(3)); l.put(4,
-		 * listOfDaemons.get(4)); l.put(5, listOfDaemons.get(5)); l.put(6,
-		 * listOfDaemons.get(6));
-		 * 
-		 * 
-		 * // fichier 2 l = new HashMap<Integer, String>(); l.put(1,
-		 * listOfDaemons.get(3)); l.put(2, listOfDaemons.get(4));
-		 * 
-		 * repartition_bloc.put(2, l);
-		 * 
-		 * // fichier 3 l = new HashMap<Integer, String>(); l.put(1,
-		 * listOfDaemons.get(5)); l.put(2, listOfDaemons.get(6));
-		 * 
-		 * repartition_bloc.put(3, l);
-		
-
-		return repartition_bloc;
-
-	} */
 
 	public static String getNamNodeURL() {
 		String res = null;
@@ -264,15 +236,21 @@ public class HdfsClient {
 	}
 
 	public static void main(String[] args) {
-
-		data = new Project();
-		
-		nbNodes = data.urlNodes.size();
 		
 		try {
 			NameNodeInterface nNI;
 
 			nNI = (NameNodeInterface) Naming.lookup(getNamNodeURL());
+			
+			if(nNI.structureExists()) {
+				System.out.println("Namenode existant : Recuperation.");
+				data = nNI.recoverStructure();
+			} else {
+				System.out.println("Pas de namenode trouvÃ©, crÃ©ation d'un nouveau.");
+				data = new Project();
+			}
+			
+			nbNodes = data.urlServ.size();
 
 			if (args.length < 2) {
 				usage();
@@ -304,7 +282,7 @@ public class HdfsClient {
 				HdfsWrite(fmt, args[2], 1);
 			}
 
-			/* Mise à jour du namenode */
+			/* Mise ï¿½ jour du namenode */
 			nNI.updateStructure(data);
 
 		} catch (Exception e) {
