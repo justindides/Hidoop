@@ -19,7 +19,7 @@ public class NameNode extends UnicastRemoteObject implements NameNodeInterface {
 	//private static String hdfsClientURL;
 	private Project structure;
 	private static int port = 8000;
-	private int idFile;
+	//private int idFile;
 
 	public NameNode() throws RemoteException {
 	}
@@ -28,7 +28,7 @@ public class NameNode extends UnicastRemoteObject implements NameNodeInterface {
 		structure = struct;
 	}
 
-	public void setInputFname(String inputFname) throws RemoteException, WrongFileNameException {
+/*	public void setInputFname(String inputFname) throws RemoteException, WrongFileNameException {
 		idFile = 1;
 
 		for (int i = 1; i <= structure.inputFileNameList.size(); i++) {
@@ -42,19 +42,19 @@ public class NameNode extends UnicastRemoteObject implements NameNodeInterface {
 		if (idFile > structure.inputFileNameList.size()) {
 			throw new WrongFileNameException();
 		}
+	}*/
+
+	public int getNumberOfMaps(String inputFname) throws RemoteException {
+		return structure.numberOfMaps.get(inputFname);
 	}
 
-	public int getNumberOfMaps() throws RemoteException {
-		return structure.numberOfMapsList.get(idFile);
-	}
-
-	public HashMap<Integer, String> getDaemonsURL() throws RemoteException {
-		return structure.daemonsURLRepartized.get(idFile);
+	public HashMap<Integer, String> getDaemonsURL(String inputFname) throws RemoteException {
+		return structure.daemonsFragmentRepartized.get(inputFname);
 	}
 	
-	public String getIntputFileName() throws RemoteException {
+/*	public String getIntputFileName() throws RemoteException {
 		return structure.inputFileNameList.get(idFile);
-	}
+	}*/
 
 /*	public static void getHDFSClientURL() {
 		try {

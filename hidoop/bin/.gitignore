@@ -1,2 +1,6 @@
+/application/
+/config/
+/formats/
 /hdfs/
+/map/
 /ordo/

@@ -72,9 +72,9 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 
 		} finally {
 			daemonsURL = new HashMap<Integer, String>();
-			nn.setInputFname(originalFname);
-			numberOfMaps = nn.getNumberOfMaps();
-			daemonsURL = nn.getDaemonsURL();
+			//nn.setInputFname(originalFname);
+			numberOfMaps = nn.getNumberOfMaps(originalFname);
+			daemonsURL = nn.getDaemonsURL(originalFname);
 		}
 	}
 
