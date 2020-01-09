@@ -21,13 +21,9 @@ public class Project implements Serializable {
 	/** Liste des URL des daemons, rï¿½cupï¿½rï¿½ par un fichier de config. */ 
 	public List<String> urlNodes = new ArrayList<String>();
 	
-<<<<<<< HEAD
 	public List<Integer> portNodes = new ArrayList<Integer>();
 	
 	/** HashMap associant le fichier traité à son nombre de frgament */
-=======
-	/** HashMap associant le fichier traitï¿½ ï¿½ son nombre de frgament */
->>>>>>> branch 'master' of https://github.com/justindides/Hidoop.git
 	public HashMap<String,Integer> numberOfMaps;
 	
 	/** HashMap associant un fichier traitï¿½ par HDFS ï¿½ une autre map contenant 
@@ -64,14 +60,9 @@ public class Project implements Serializable {
 		int numberOfFile = 0;
 
 		try {
-<<<<<<< HEAD
-			FileInputStream isConf = new FileInputStream("hidoop/data/hdfsclient/structure.conf");
-			FileInputStream isDaemons = new FileInputStream("hidoop/data/hdfsclient/daemons.listofurl");
 			FileInputStream isPorts = new FileInputStream("hidoop/data/hdfsclient/portDaemons.conf");
-=======
 			FileInputStream isConf = new FileInputStream("hidoop/data/hdfsClient/structure.conf");
 			FileInputStream isDaemons = new FileInputStream("hidoop/data/hdfsClient/daemons.listofurl");
->>>>>>> branch 'master' of https://github.com/justindides/Hidoop.git
 
 			propDaemons.load(isDaemons);
 			isDaemons.close();
@@ -121,13 +112,7 @@ public class Project implements Serializable {
 				port = propPorts.getProperty("port" + nbPorts);
 			}
 
-<<<<<<< HEAD
-			
-			for (int i = 1; i <= inputFileNameList.size(); i++) {
-=======
-
 			for (int i = 0; i < inputFileNameList.size(); i++) {
->>>>>>> branch 'master' of https://github.com/justindides/Hidoop.git
 				System.out.println(inputFileNameList.get(i));
 				if (inputFileNameList.get(i) == null) {
 					throw new InvalidPropertyException("structure.inputFileNameList.get(" + i + ")");

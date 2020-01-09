@@ -22,13 +22,8 @@ import java.net.UnknownHostException;
 public class HdfsClient {
 
 	// private static final long serialVersionUID = 1L;
-<<<<<<< HEAD
 	/** Data contient toutes la configuration initiale du projet ainsi que les 
 	 * informations qu'on a à donner à Hidoop.
-=======
-	/** Structure contient toutes la configuration initiale du projet ainsi que les 
-	 * informations qu'on a ï¿½ donner ï¿½ Hidoop.
->>>>>>> branch 'master' of https://github.com/justindides/Hidoop.git
 	 */
 	private static Project data = new Project();
 	
@@ -184,23 +179,14 @@ public class HdfsClient {
 			strRecu = new String();
 			
 			fw = new FileWriter(f);
-<<<<<<< HEAD
 
 			/* Pour chaque fragment, on possède l'URL du node le stockant. */
-=======
-			
-			/* Pour chaque fragment, on possï¿½de l'URL du node le stockant. */
->>>>>>> branch 'master' of https://github.com/justindides/Hidoop.git
 			mappingBlocs.forEach((i, url) -> {
 
 				try {
-<<<<<<< HEAD
+
 				/* On ouvre une connexion poura chaque fragment, on lie, on le concatene à strRecu */
 					Socket sock = new Socket(url, data.portNodes.get(data.urlNodes.indexOf(url)));
-=======
-				/* On ouvre une connexion poura chaque fragment, on lie, on le concatene ï¿½ strRecu */
-					sock = new Socket(url, port);
->>>>>>> branch 'master' of https://github.com/justindides/Hidoop.git
 					Connexion c = new Connexion(sock);
 					
 				/* Rappel : le nom d'un fragment est nom_du_fichier-blocx avec x numï¿½ro du fragment. */
@@ -318,13 +304,9 @@ public class HdfsClient {
 				HdfsWrite(fmt, args[2], 1);
 			}
 
-<<<<<<< HEAD
 			/* Mise à jour du namenode */
 			nNI.updateStructure(data);
-=======
-			/* Mise ï¿½ jour du namenode */
-			nNI.updateStructure(structure);
->>>>>>> branch 'master' of https://github.com/justindides/Hidoop.git
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(0);
