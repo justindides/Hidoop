@@ -180,7 +180,7 @@ public class HdfsClient {
 		HashMap<Integer, String> mappingBlocs = data.daemonsFragmentRepartized.get(fSansExtension);
 
 		/* Fichier dans lequel on �crira le r�sultat de la lecture */
-		localFSDestFname = data.PATH + fSansExtension + "_recover";
+		localFSDestFname = data.PATH + fSansExtension + "-concatenated.txt";
 		File f = new File(localFSDestFname);
 		FileWriter fw;
 
@@ -199,13 +199,13 @@ public class HdfsClient {
 					Connexion c = new Connexion(sock);
 					
 				/* Rappel : le nom d'un fragment est nom_du_fichier-blocx avec x num�ro du fragment. */
-					Commande cmd = new Commande(Commande.Cmd.CMD_READ, fSansExtension + "-bloc" + i, 0);
+					Commande cmd = new Commande(Commande.Cmd.CMD_READ, fSansExtension + "-res" + i + ".txt", 0);
 					c.send(cmd);
 					
 					// On concatene les textes de tous les fragments.
 					strRecu = strRecu + (String) c.receive();
 					
-					System.out.println("Lecture du fragment " + fSansExtension + "-bloc" + i + " sur le node " + nbNode);
+					System.out.println("Lecture du fragment " + fSansExtension + "-res" + i + " sur le node " + nbNode);
 	
 					c.Close();
 				} catch (UnknownHostException e) {
