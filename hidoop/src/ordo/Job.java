@@ -50,7 +50,7 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 		if (numberOfMapCallBack == numberOfMaps) {
 			System.out.println("L'ensemble des maps ont été exécuté, appel du read HDFS");
 			try {
-				Process read = Runtime.getRuntime().exec("java hidoop/bin/hdfs/HdfsClient read originalFname");
+				Process read = Runtime.getRuntime().exec("java hidoop/bin/hdfs/HdfsClient read " + originalFname);
 				read.waitFor();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
