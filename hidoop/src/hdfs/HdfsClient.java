@@ -35,7 +35,7 @@ public class HdfsClient {
 	private static int nbNodes;
 
 	/** D�finie la taille maximal d'un fragment lors de l'�criture. */
-	private static int tailleMaxFragment = 20;
+	private static int tailleMaxFragment = 50;
 	
 	/** Texte recu lors d'une lecture. */
 	private static String strRecu;
