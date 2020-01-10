@@ -4,6 +4,7 @@ package ordo;
 
 import map.MapReduce;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.rmi.*;
 import java.rmi.server.UnicastRemoteObject;
 
@@ -47,7 +48,18 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 		}
 
 		if (numberOfMapCallBack == numberOfMaps) {
-			System.out.println("L'ensemble des maps ont été exécuté, execution du reduce");
+			System.out.println("L'ensemble des maps ont été exécuté, appel du read HDFS");
+			try {
+				Process read = Runtime.getRuntime().exec("java hidoop/bin/hdfs/HdfsClient read originalFname");
+				read.waitFor();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println("Read fini, appel du reduce");
 			startReduce();
 		}
 
