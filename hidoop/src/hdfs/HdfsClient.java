@@ -177,7 +177,7 @@ public class HdfsClient {
 		// pour utiliser la bonne connexion.
 		String fSansExtension = hdfsFname.replaceFirst("[.][^.]+$", "");
 
-		HashMap<Integer, String> mappingBlocs = data.daemonsFragmentRepartized.get(fSansExtension);
+		HashMap<Integer, String> mappingBlocs = data.daemonsFragmentRepartized.get(hdfsFname);
 
 		/* Fichier dans lequel on �crira le r�sultat de la lecture */
 		localFSDestFname = data.PATH + fSansExtension + "-concatenated.txt";
