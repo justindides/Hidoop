@@ -35,7 +35,7 @@ public class HdfsClient {
 	private static int nbNodes;
 
 	/** Dï¿½finie la taille maximal d'un fragment lors de l'ï¿½criture. */
-	private static int tailleMaxFragment = 50;
+	private static int tailleMaxFragment = 10000;
 	
 	/** Texte recu lors d'une lecture. */
 	private static String strRecu;
@@ -89,14 +89,12 @@ public class HdfsClient {
 		Commande cmd = new Commande(Commande.Cmd.CMD_WRITE, "", 0);
 
 		/* Buffer d'envoi de texte
-		 * On veut que le dernier caractère soit un espace ' ', ou la fin du fichier pour ne pas 
-		 * couper un mot en 2. On Tronquera donc la fin du buffer jusqu'à ce qu'elle corresponde à un espace.
+		 * On veut que le dernier caractï¿½re soit un espace ' ', ou la fin du fichier pour ne pas 
+		 * couper un mot en 2. On Tronquera donc la fin du buffer jusqu'ï¿½ ce qu'elle corresponde ï¿½ un espace.
 		 */
 		char[] buf = new char[tailleMaxFragment];
 		int nbCaracEnvoye;
-		/* Buffer pour les caractère tronqués. 30 max, valeur arbitraire */
-		char[] bufCaracPerdu = new char[30];
-		/* Resprésente le nombre de caractère qu'on enleve du buffer avant de rencontre un ' '. */
+		/* Resprï¿½sente le nombre de caractï¿½re qu'on enleve du buffer avant de rencontre un ' '. */
 		int nbCaracPerdu = 0;
 		int j;
 
@@ -140,40 +138,40 @@ public class HdfsClient {
 				System.out.println("Ecriture du fragment n " + i + " sur le node " + node);
 				System.out.println("Lecture...");
 				
-				ret = fr.read(buf, nbCaracPerdu, tailleMaxFragment);
-				
-				/* On repalce les caractères tronqués au dernier fragment en début de buffer. Sur la ligne au dessus,
-				 * on voit que l'on réserve le début du buffer à ces caractères en commencant le stockage plus loin.
+				/* On repalce les caractï¿½res tronquï¿½s au dernier fragment en dï¿½but de buffer. Sur la ligne au dessus,
+				 * on voit que l'on rï¿½serve le dï¿½but du buffer ï¿½ ces caractï¿½res en commencant le stockage plus loin.
 				 */
 				for(int l = 0; l < nbCaracPerdu; l++) {
-					buf[l] = bufCaracPerdu[nbCaracPerdu - l - 1];
+					buf[l] = buf[tailleMaxFragment - nbCaracPerdu + l];
 				}
 				
-				j = ret;
+				ret = fr.read(buf, nbCaracPerdu, tailleMaxFragment-nbCaracPerdu);
+				
+				j = tailleMaxFragment;
 				nbCaracPerdu = 0;
-
-				if(ret != -1) {
-					while(buf[j-1] != ' ') {
+				if(i != nbFragment) {
+					while(buf[j-1] != ' '){
+						System.out.println(buf[j-1]);
 						j--;
-						bufCaracPerdu[nbCaracPerdu] = buf[j-1];
 						nbCaracPerdu++;
 					}
-					/* On rajoute les caractère non lus au reste */
+					/* On rajoute les caractï¿½re non lus au reste */
 					reste += nbCaracPerdu;
-					/* Si le reste est supérieur à une taille de fragment, on rajoute un fragment. */ 
+					/* Si le reste est supï¿½rieur ï¿½ une taille de fragment, on rajoute un fragment. */ 
 					if(reste >= tailleMaxFragment) {
 						reste -= tailleMaxFragment;
 						nbFragment ++;
 					}
 					nbCaracEnvoye = tailleMaxFragment - nbCaracPerdu;
-					System.out.println("Lecture finie, fragment contenant : " + nbCaracEnvoye + " caractères.");
+					System.out.println("Lecture finie, fragment contenant : " + nbCaracEnvoye + " caractï¿½res.");
 					
 				} else {
+					System.out.println("ret = -1");
 					nbCaracEnvoye = reste;
-					System.out.println("Fin du fichier atteinte, dernier fragment à envoyer, de taille : " + nbCaracEnvoye + " caractères.");
+					System.out.println("Fin du fichier atteinte, dernier fragment ï¿½ envoyer, de taille : " + nbCaracEnvoye + " caractï¿½res.");
 				}
 
-
+				System.out.println("perdu : " + nbCaracPerdu + " envoye : " + nbCaracEnvoye);
 				cmd = new Commande(Commande.Cmd.CMD_WRITE, fSansExtension + "-bloc" + i + ".txt", nbCaracEnvoye);
 				c.send(cmd);
 				System.out.println("Envoi du fragment...");

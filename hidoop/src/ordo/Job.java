@@ -3,8 +3,6 @@
 package ordo;
 
 import map.MapReduce;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.rmi.*;
@@ -17,8 +15,8 @@ import formats.Format;
 
 import formats.KVFormat;
 import formats.LineFormat;
-import formats.Format.OpenMode;
 import hdfs.HdfsClient;
+import formats.Format.OpenMode;
 
 public class Job extends UnicastRemoteObject implements JobInterface, JobInterfaceX, CallBack {
 
@@ -52,15 +50,9 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 
 		if (numberOfMapCallBack == numberOfMaps) {
 			System.out.println("L'ensemble des maps ont été exécuté, appel du read HDFS");
-			/*
-				ProcessBuilder read = new ProcessBuilder();
-				read.command("bash", "-c", "java", "../hdfs/HdfsClient", "read", originalFname);
-				read.redirectError();
-				//read.directory(new File("~/git/HidoopMaster/hidoop/bin/hdfs/"));
-				Process p = read.start();
-				p.waitFor(); */
-				String args[] = {"read", originalFname};
-				HdfsClient.main(args);
+			
+			String[] args = {"read", originalFname};
+			HdfsClient.main(args);
 			System.out.println("Read fini, appel du reduce");
 			startReduce();
 		}

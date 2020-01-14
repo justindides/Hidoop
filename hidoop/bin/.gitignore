@@ -2,5 +2,14 @@
 /config/
 /formats/
 /hdfs/
+/hdfsClient/
+/job/
 /map/
 /ordo/
+/test-bloc1.txt
+/test-bloc3.txt
+/test-bloc5.txt
+/test-bloc7.txt
+/test-concatenated.txt
+/test-res.txt
+/test.txt
