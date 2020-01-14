@@ -18,10 +18,10 @@ public class Project implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static String PATH = "hidoop/data/";
 
-	/** Liste des URL des daemons, r�cup�r� par un fichier de config. */ 
+	/** Liste des adresses des Nodes pour les serveurs Hdfs, r�cup�r� par un fichier de config. */ 
 	public List<String> urlServ= new ArrayList<String>();
 	
-	/** Liste des URL des nodes, r�cup�r� par un fichier de config. */ 
+	/** Liste des URL des daemons Hidoop sur les nodes, r�cup�r� par un fichier de config. */ 
 	public List<String> urlDaemons = new ArrayList<String>();
 	
 	public List<Integer> portNodes = new ArrayList<Integer>();
@@ -139,15 +139,6 @@ public class Project implements Serializable {
 					throw new InvalidPropertyException("structure.inputFileNameList.get(" + i + ")");
 				}
 			}
-			/*
-			for (int i = 1; i <= daemonsFragmentRepartized.size(); i++) {
-				for (int j = 1; j <= daemonsFragmentRepartized.get(i).size(); j++) {
-					if (daemonsFragmentRepartized.get(i).get(j) == null) {
-						throw new InvalidPropertyException(
-								"structure.daemonsURLRepartized.get(" + i + ").get(" + j + ")"); 
-					} 
-				}
-			} */
 		}
 	}
 }

@@ -41,13 +41,16 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 
 	}
 
+	//Implémentation du callback :
 	public void callback(String URL) throws RemoteException {
-		System.out.println("Callback end of map: received message [" + URL + "]");
+		System.out.println("Callback end of map: received message from [" + URL + "]");
 
+		//indentation du nombre de callback reçu :
 		if (daemonsURL.containsValue(URL)) {
 			numberOfMapCallBack++;
 		}
 
+		//Si Job à reçu l'ensemble des callbacks :
 		if (numberOfMapCallBack == numberOfMaps) {
 			System.out.println("L'ensemble des maps ont été exécuté, appel du read HDFS");
 			
@@ -59,11 +62,11 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 
 	}
 
+	//Récupération des properties des fichiers de configuration par appel au namenode:
 	public void setProperties() throws RemoteException, WrongFileNameException {
 		NameNodeInterface nn = null;
 
 		try {
-
 			FileInputStream in = new FileInputStream("hidoop/data/job/namenode.url");
 			Properties prop = new Properties();
 			prop.load(in);
@@ -78,7 +81,6 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 
 		} finally {
 			daemonsURL = new HashMap<Integer, String>();
-			//nn.setInputFname(originalFname);
 			numberOfMaps = nn.getNumberOfMaps(originalFname);
 			daemonsURL = nn.getDaemonsURL(originalFname);
 		}
@@ -91,32 +93,36 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 		String URL;
 
 		try {
+			//Récupération des properties des fichiers de configuration :
 			setProperties();
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(0);
 		}
 
+		//Récuparation du nom de fichier sans l'extension
 		String[] res = originalFname.split("[.]");
 
 		for (int id = 0; id < numberOfMaps; id++) {
-
+			//Création des noms de fichiers blocs :
 			inputFname = Project.PATH + res[0] + "-bloc" + id + "." + res[1];
 
+			//Définition du format de fichier :
 			if (inputFormat == Format.Type.LINE) {
 				inFormat = new LineFormat(inputFname);
-
 			} else if (inputFormat == Format.Type.KV) {
 				inFormat = new KVFormat(inputFname);
 			}
 
+			//Génération du nom de fichier résultat
 			outputFname = Project.PATH + res[0] + "-res" + id + "." + res[1];
 			outFormat = new KVFormat(outputFname);
 
 			try {
 
 				URL = daemonsURL.get(id);
-
+				
+				//Appel du démon :
 				System.out.println("Lancement map : " + URL);
 				d = (Daemon) Naming.lookup(URL);
 				d.runMap(mr, inFormat, outFormat, new Job());
@@ -138,14 +144,16 @@ public class Job extends UnicastRemoteObject implements JobInterface, JobInterfa
 
 		String[] res = originalFname.split("[.]");
 
+		//Nom normalisé du fichier d'entré au réduce :
 		inputFname = Project.PATH + res[0] + "-concatenated." + res[1];
 		inFormat = new KVFormat(inputFname);
 
+		//Nom du fichier de résultat :
 		outputFname = Project.PATH + res[0] + "-res." + res[1];
 		outFormat = new KVFormat(outputFname);
 
+		
 		inFormat.open(OpenMode.R);
-
 		outFormat.open(OpenMode.W);
 
 		mapReduce.reduce(inFormat, outFormat);

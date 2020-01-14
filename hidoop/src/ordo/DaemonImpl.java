@@ -1,15 +1,11 @@
 package ordo;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import java.net.*;
-import java.net.UnknownHostException;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.*;
-
 import map.Mapper;
 import formats.Format;
 import formats.Format.OpenMode;
@@ -22,22 +18,20 @@ public class DaemonImpl extends UnicastRemoteObject implements Daemon {
 	public DaemonImpl() throws RemoteException {
 	}
 
-	public String getURL() throws RemoteException {
-		return URL;
-	}
-
-	// pour git
-
 	public void runMap(Mapper m, Format reader, Format writer, CallBack cb) throws RemoteException {
 		try {
+			//Ouverture (ou creations) des fichiers de lecture et d'écriture
 			reader.open(OpenMode.R);
 			writer.open(OpenMode.W);
 
+			//execution du map sur le fragment de fichier local
 			m.map(reader, writer);
 
+			//fermeture des fichiers de lecture et d'écriture
 			reader.close();
 			writer.close();
-
+			
+			//appel du callback après l'exécution du map
 			cb.callback(URL);
 
 			System.out.println("Map executed");
@@ -48,9 +42,11 @@ public class DaemonImpl extends UnicastRemoteObject implements Daemon {
 	}
 
 	public static void main(String args[]) {
-		int port = 8001;
+		//Choix du port du démon
+		int port = Integer.parseInt(args[0]);
 
-		Integer idInt = new Integer(args[0]);
+		//identifiant du démon (utile pour des test en local pour différencier les démons)
+		Integer idInt = new Integer(args[1]);
 		DaemonImpl dI;
 		//////////////////////////////////////////// CREATION DU DAEMON
 		//////////////////////////////////////////// ////////////////////////////////////////////
@@ -58,14 +54,15 @@ public class DaemonImpl extends UnicastRemoteObject implements Daemon {
 			dI = new DaemonImpl();
 			dI.URL = "//" + InetAddress.getLocalHost().getHostName() + ":" + port + "/Daemon" + idInt.intValue();
 
+			//Code permettant de créer automatiquement le registry s'il n'éxiste pas 
 			try {
-				Registry registry = LocateRegistry.getRegistry(port);
+				LocateRegistry.getRegistry(port);
 				Naming.rebind(dI.URL, dI);
-				System.out.println("registry existant");
+				System.out.println("Registry existant");
 
 			} catch (Exception e) {
 				try {
-					System.out.println("creation registry");
+					System.out.println("Registry inexistant, creation du registry");
 					LocateRegistry.createRegistry(port);
 					Naming.rebind(dI.URL, dI);
 				} catch (Exception ex) {
@@ -80,7 +77,6 @@ public class DaemonImpl extends UnicastRemoteObject implements Daemon {
 			//////////////////////////////////////////// ////////////////////////////////////////////
 
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 
