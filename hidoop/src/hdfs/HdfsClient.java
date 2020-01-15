@@ -23,11 +23,12 @@ import java.net.UnknownHostException;
 public class HdfsClient {
 
 	// private static final long serialVersionUID = 1L;
-	/** Data contient toutes la configuration initiale du projet ainsi que les 
+	/**
+	 * Data contient toutes la configuration initiale du projet ainsi que les
 	 * informations qu'on a � donner � Hidoop.
 	 */
 	private static Project dataStructure;
-	
+
 	/** L'URL de la machine contenant le namenode. */
 	private static String nameNodeURL;
 
@@ -36,7 +37,7 @@ public class HdfsClient {
 
 	/** D�finie la taille maximal d'un fragment lors de l'�criture. */
 	private static int tailleMaxFragment = 10000;
-	
+
 	/** Texte recu lors d'une lecture. */
 	private static String strRecu;
 
@@ -57,9 +58,10 @@ public class HdfsClient {
 		mappingBlocs.forEach((i, url) -> {
 			Socket sock;
 			try {
-			/* Pour recuperer le port, on cherche l'indice d'url dans notre liste d'url. 
-			 * Cette indice correspond au port dans la liste des ports.
-			 */
+				/*
+				 * Pour recuperer le port, on cherche l'indice d'url dans notre liste d'url.
+				 * Cette indice correspond au port dans la liste des ports.
+				 */
 				int nbNode = dataStructure.urlDaemons.indexOf(url);
 				sock = new Socket(dataStructure.urlServ.get(nbNode), dataStructure.portNodes.get(nbNode));
 				Connexion c = new Connexion(sock);
@@ -76,7 +78,7 @@ public class HdfsClient {
 			}
 		});
 		dataStructure.daemonsFragmentRepartized.remove(fSansExtension);
-	} 
+	}
 
 	/***************** WRITE ********************/
 	public static void HdfsWrite(Format.Type fmt, String localFSSourceFname, int repFactor) {
@@ -88,19 +90,23 @@ public class HdfsClient {
 
 		Commande cmd = new Commande(Commande.Cmd.CMD_WRITE, "", 0);
 
-		/* Buffer d'envoi de texte
-		 * On veut que le dernier caract�re soit un espace ' ', ou la fin du fichier pour ne pas 
-		 * couper un mot en 2. On Tronquera donc la fin du buffer jusqu'� ce qu'elle corresponde � un espace.
+		/*
+		 * Buffer d'envoi de texte On veut que le dernier caract�re soit un espace ' ',
+		 * ou la fin du fichier pour ne pas couper un mot en 2. On Tronquera donc la fin
+		 * du buffer jusqu'� ce qu'elle corresponde � un espace.
 		 */
 		char[] buf = new char[tailleMaxFragment];
 		int nbCaracEnvoye;
-		/* Respr�sente le nombre de caract�re qu'on enleve du buffer avant de rencontre un ' '. */
+		/*
+		 * Respr�sente le nombre de caract�re qu'on enleve du buffer avant de rencontre
+		 * un ' '.
+		 */
 		int nbCaracPerdu = 0;
 		int j;
 
-		/*Val de retour du read */
+		/* Val de retour du read */
 		int ret;
-		
+
 		int nbFragment = (int) (tailleFichier / tailleMaxFragment);
 		int reste = (int) (tailleFichier % tailleMaxFragment);
 		System.out.println("Nombre de fragments requis : " + nbFragment);
@@ -112,8 +118,8 @@ public class HdfsClient {
 			nbFragment++;
 		}
 		/*
-		 * Ce buffer servira à transmettre le dernier fragments qui n'aura pas un
-		 * nombre fixe de caractere.
+		 * Ce buffer servira à transmettre le dernier fragments qui n'aura pas un nombre
+		 * fixe de caractere.
 		 */
 		char[] miniBuf = new char[reste];
 
@@ -128,55 +134,57 @@ public class HdfsClient {
 			int i;
 			/* Liste contenant tous les noms de fragments */
 			HashMap<Integer, String> mappingBlocs = new HashMap<Integer, String>();
-			
+
 			// Envoi des fragments.
 			for (i = 0; i < nbFragment; i++) {
-				System.out.println(dataStructure.urlServ.get(node));
-				System.out.println(dataStructure.portNodes.get(node));
 				Socket sock = new Socket(dataStructure.urlServ.get(node), dataStructure.portNodes.get(node));
 				Connexion c = new Connexion(sock);
 				System.out.println("Ecriture du fragment n " + i + " sur le node " + node);
 				System.out.println("Lecture...");
-				
-				/* On repalce les caract�res tronqu�s au dernier fragment en d�but de buffer. Sur la ligne au dessus,
-				 * on voit que l'on r�serve le d�but du buffer � ces caract�res en commencant le stockage plus loin.
+
+				/*
+				 * On repalce les caract�res tronqu�s au dernier fragment en d�but de buffer.
+				 * Sur la ligne au dessus, on voit que l'on r�serve le d�but du buffer � ces
+				 * caract�res en commencant le stockage plus loin.
 				 */
-				for(int l = 0; l < nbCaracPerdu; l++) {
+				for (int l = 0; l < nbCaracPerdu; l++) {
 					buf[l] = buf[tailleMaxFragment - nbCaracPerdu + l];
 				}
-				
-				ret = fr.read(buf, nbCaracPerdu, tailleMaxFragment-nbCaracPerdu);
-				
+
+				ret = fr.read(buf, nbCaracPerdu, tailleMaxFragment - nbCaracPerdu);
+
 				j = tailleMaxFragment;
 				nbCaracPerdu = 0;
-				if(i != nbFragment) {
-					while(buf[j-1] != ' '){
-						System.out.println(buf[j-1]);
+				if (i != nbFragment) {
+					while (buf[j - 1] != ' ' && j >= 1) {
+						System.out.println(buf[j - 1]);
 						j--;
 						nbCaracPerdu++;
 					}
 					/* On rajoute les caract�re non lus au reste */
 					reste += nbCaracPerdu;
-					/* Si le reste est sup�rieur � une taille de fragment, on rajoute un fragment. */ 
-					if(reste >= tailleMaxFragment) {
+					/*
+					 * Si le reste est sup�rieur � une taille de fragment, on rajoute un fragment.
+					 */
+					if (reste >= tailleMaxFragment) {
 						reste -= tailleMaxFragment;
-						nbFragment ++;
+						nbFragment++;
 					}
 					nbCaracEnvoye = tailleMaxFragment - nbCaracPerdu;
 					System.out.println("Lecture finie, fragment contenant : " + nbCaracEnvoye + " caract�res.");
-					
+
 				} else {
-					System.out.println("ret = -1");
 					nbCaracEnvoye = reste;
-					System.out.println("Fin du fichier atteinte, dernier fragment � envoyer, de taille : " + nbCaracEnvoye + " caract�res.");
+					System.out.println("Fin du fichier atteinte, dernier fragment � envoyer, de taille : "
+							+ nbCaracEnvoye + " caract�res.");
 				}
 
 				System.out.println("perdu : " + nbCaracPerdu + " envoye : " + nbCaracEnvoye);
 				cmd = new Commande(Commande.Cmd.CMD_WRITE, fSansExtension + "-bloc" + i + ".txt", nbCaracEnvoye);
 				c.send(cmd);
 				System.out.println("Envoi du fragment...");
-				c.send(buf);		
-				
+				c.send(buf);
+
 				/* Association du fragment au daemon correspondant */
 				mappingBlocs.put(i, dataStructure.urlDaemons.get(node));
 				node++;
@@ -185,12 +193,12 @@ public class HdfsClient {
 				}
 				c.Close();
 			}
-			
+
 			dataStructure.numberOfMaps.put(localFSSourceFname, nbFragment);
-			
+
 			System.out.println("Fin de l'ecriture " + i + " fragment ecrits.");
 			dataStructure.daemonsFragmentRepartized.put(localFSSourceFname, mappingBlocs);
-			
+
 			fr.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -211,7 +219,7 @@ public class HdfsClient {
 
 		try {
 			strRecu = new String();
-			
+
 			fw = new FileWriter(f);
 
 			/* Pour chaque fragment, on poss�de l'URL du node le stockant. */
@@ -219,19 +227,25 @@ public class HdfsClient {
 
 				try {
 					int nbNode = dataStructure.urlDaemons.indexOf(url);
-				/* On ouvre une connexion poura chaque fragment, on lie, on le concatene � strRecu */
+					/*
+					 * On ouvre une connexion poura chaque fragment, on lie, on le concatene �
+					 * strRecu
+					 */
 					Socket sock = new Socket(dataStructure.urlServ.get(nbNode), dataStructure.portNodes.get(nbNode));
 					Connexion c = new Connexion(sock);
-					
-				/* Rappel : le nom d'un fragment est nom_du_fichier-blocx avec x num�ro du fragment. */
+
+					/*
+					 * Rappel : le nom d'un fragment est nom_du_fichier-blocx avec x num�ro du
+					 * fragment.
+					 */
 					Commande cmd = new Commande(Commande.Cmd.CMD_READ, fSansExtension + "-res" + i + ".txt", 0);
 					c.send(cmd);
-					
+
 					// On concatene les textes de tous les fragments.
 					strRecu = strRecu + (String) c.receive();
-					
+
 					System.out.println("Lecture du fragment " + fSansExtension + "-res" + i + " sur le node " + nbNode);
-	
+
 					c.Close();
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
@@ -245,7 +259,6 @@ public class HdfsClient {
 			e.printStackTrace();
 		}
 	}
-
 
 	public static String getNamNodeURL() {
 		String res = null;
@@ -265,20 +278,20 @@ public class HdfsClient {
 	}
 
 	public static void main(String[] args) {
-		
+
 		try {
 			NameNodeInterface nNI;
 
 			nNI = (NameNodeInterface) Naming.lookup(getNamNodeURL());
-			
-			if(nNI.structureExists()) {
+
+			if (nNI.structureExists()) {
 				System.out.println("Namenode existant : Recuperation.");
 				dataStructure = nNI.recoverStructure();
 			} else {
 				System.out.println("Pas de namenode trouvé, création d'un nouveau.");
 				dataStructure = new Project();
 			}
-			
+
 			nbNodes = dataStructure.urlServ.size();
 
 			if (args.length < 2) {
