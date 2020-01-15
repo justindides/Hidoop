@@ -78,7 +78,7 @@ public class Project implements Serializable {
 		int numberOfFile = 0;
 
 		try {
-			FileInputStream isPorts = new FileInputStream("hidoop/data/hdfsClient/portDaemons.conf");
+			FileInputStream isPorts = new FileInputStream("hidoop/data/hdfsClient/portNodes.conf");
 			FileInputStream isConf = new FileInputStream("hidoop/data/hdfsClient/structure.conf");
 			FileInputStream isDaemons = new FileInputStream("hidoop/data/hdfsClient/daemons.listofurl");
 			FileInputStream isServ = new FileInputStream("hidoop/data/hdfsClient/servHdfs.listofurl");
