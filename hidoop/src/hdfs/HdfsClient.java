@@ -117,11 +117,6 @@ public class HdfsClient {
 			System.out.println("Reste différent de 0 donc ajout d'un fragment.");
 			nbFragment++;
 		}
-		/*
-		 * Ce buffer servira à transmettre le dernier fragments qui n'aura pas un nombre
-		 * fixe de caractere.
-		 */
-		char[] miniBuf = new char[reste];
 
 		try {
 			/*
@@ -157,7 +152,6 @@ public class HdfsClient {
 				nbCaracPerdu = 0;
 				if (i != nbFragment) {
 					while (buf[j - 1] != ' ' && j >= 1) {
-						System.out.println(buf[j - 1]);
 						j--;
 						nbCaracPerdu++;
 					}
