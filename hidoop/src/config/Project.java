@@ -19,7 +19,7 @@ import java.util.Properties;
 public class Project implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	public static String PATH = "hidoop/data/";
+	public static String PATH = "/tmp/";
 
 	/**
 	 * Liste des adresses des Nodes pour les serveurs Hdfs, r�cup�r� par un fichier
