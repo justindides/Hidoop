@@ -1,5 +1,5 @@
 # Définition des constantes
-PATH_REPO='/home/cgarosai/git/HidoopMaster/hidoop'
+PATH_REPO='/home/cgarosai/git/HidoopMaster/hidoop/bin'
 SUFFIX='.enseeiht.fr'
 CLIENT='luke'${SUFFIX}
 DAEMON1='malicia'${SUFFIX}
