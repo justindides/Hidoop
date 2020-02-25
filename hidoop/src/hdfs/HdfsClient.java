@@ -36,7 +36,7 @@ public class HdfsClient {
 	private static int nbNodes;
 
 	/** D�finie la taille maximal d'un fragment lors de l'�criture. */
-	private static int tailleMaxFragment = 10000;
+	private static int tailleMaxFragment = 100;
 
 	/** Texte recu lors d'une lecture. */
 	private static String strRecu;
@@ -87,7 +87,7 @@ public class HdfsClient {
 		/* On récupère le nom du fichier sans l'extension (.txt en general) */
 		String fSansExtension = localFSSourceFname.replaceFirst("[.][^.]+$", "");
 		long tailleFichier = f.length();
-
+		System.out.println("Taille du fichier à traiter :" + tailleFichier);
 		Commande cmd = new Commande(Commande.Cmd.CMD_WRITE, "", 0);
 
 		/*
@@ -132,7 +132,10 @@ public class HdfsClient {
 
 			// Envoi des fragments.
 			for (i = 0; i < nbFragment; i++) {
-				Socket sock = new Socket(dataStructure.urlServ.get(node), dataStructure.portNodes.get(node));
+				// On enlève le // du début de l'adresse 
+				String addresseNode = dataStructure.urlServ.get(node);
+				addresseNode = addresseNode.substring(2, addresseNode.length());
+				Socket sock = new Socket(addresseNode, dataStructure.portNodes.get(node));
 				Connexion c = new Connexion(sock);
 				System.out.println("Ecriture du fragment n " + i + " sur le node " + node);
 				System.out.println("Lecture...");
@@ -225,7 +228,11 @@ public class HdfsClient {
 					 * On ouvre une connexion poura chaque fragment, on lie, on le concatene �
 					 * strRecu
 					 */
-					Socket sock = new Socket(dataStructure.urlServ.get(nbNode), dataStructure.portNodes.get(nbNode));
+					
+					// On enlève le // du début de l'adresse 
+					String addresseNode = dataStructure.urlServ.get(nbNode);
+					addresseNode = addresseNode.substring(2, addresseNode.length());
+					Socket sock = new Socket(addresseNode, dataStructure.portNodes.get(nbNode));
 					Connexion c = new Connexion(sock);
 
 					/*
