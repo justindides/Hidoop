@@ -23,7 +23,7 @@ ssh cgarosai@${DAEMON2} "cd ${PATH_REPO} && java ordo.DaemonImpl 8000 2"&
 ssh cgarosai@${DAEMON3} "cd ${PATH_REPO} && java ordo.DaemonImpl 8000 3"&
 ssh cgarosai@${DAEMON4} "cd ${PATH_REPO} && java ordo.DaemonImpl 8000 4"&
 sleep 5
-echp "Lancement du namenode"
+echo "Lancement du namenode"
 ssh cgarosai@${NAMENODE} "cd ${PATH_REPO} && java ordo.NameNode"&
 sleep 10
 echo "Lancement des servers"
